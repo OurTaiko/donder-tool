@@ -1,0 +1,209 @@
+import React, { useState, useMemo } from 'react'
+import { Search as SearchIcon, Info, ChevronDown, ChevronUp } from 'lucide-react'
+import { useAppContext } from '../contexts/AppContext'
+
+const Search: React.FC = () => {
+  const { songData, setDetailVisible, setDetailSongId, setDetailLevel } = useAppContext()
+
+  const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
+  const [selectedType, setSelectedType] = useState('全部')
+  
+  const sorts = ['默认', '简单', '一般', '困难', '魔王', '魔王里', '上线日期']
+  const [selectedSort, setSelectedSort] = useState('默认')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const selectSort = (sort: string) => {
+    if (sort === '默认') {
+      setSelectedSort('默认')
+      return
+    }
+    if (selectedSort === sort) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSelectedSort(sort)
+      setSortDirection('desc')
+    }
+  }
+
+  const filteredSongs = useMemo(() => {
+    let filtered = songData || []
+
+    // 搜索
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter((song: any) =>
+        song.song_name.toLowerCase().includes(query) ||
+        (song.subtitle && typeof song.subtitle === 'string' && song.subtitle.toLowerCase().includes(query)) ||
+        song.song_name_jp.toLowerCase().includes(query)
+      )
+    }
+
+    // 类型筛选
+    if (selectedType !== '全部') {
+      filtered = filtered.filter((song: any) => song.type === `${selectedType}音乐`)
+    }
+
+    // 排序
+    const sortKey = selectedSort
+    const multiplier = sortDirection === 'asc' ? 1 : -1
+    if (sortKey === '简单') {
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_1)) - parseInt(String(b.level_1))))
+    } else if (sortKey === '一般') {
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_2)) - parseInt(String(b.level_2))))
+    } else if (sortKey === '困难') {
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_3)) - parseInt(String(b.level_3))))
+    } else if (sortKey === '魔王') {
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_4)) - parseInt(String(b.level_4))))
+    } else if (sortKey === '魔王里') {
+      filtered = [...filtered].sort((a, b) => {
+        const aLevel = a.level_5 && a.level_5 !== '-' ? parseInt(String(a.level_5)) : parseInt(String(a.level_4))
+        const bLevel = b.level_5 && b.level_5 !== '-' ? parseInt(String(b.level_5)) : parseInt(String(b.level_4))
+        return multiplier * (aLevel - bLevel)
+      })
+    } else if (sortKey === '上线日期') {
+      filtered = [...filtered].sort((a, b) => {
+        const dateA = new Date(a.open_day).getTime()
+        const dateB = new Date(b.open_day).getTime()
+        return multiplier * (dateA - dateB)
+      })
+    }
+
+    return filtered
+  }, [songData, searchQuery, selectedType, selectedSort, sortDirection])
+
+  const handleOpenDetail = (songId: number, level: number) => {
+    setDetailSongId(songId)
+    setDetailLevel(level)
+    setDetailVisible(true)
+  }
+
+  const getTypeClass = (type: string) => {
+    const typeMap: Record<string, string> = {
+      '流行音乐': 'bg-blue-500',
+      '动漫音乐': 'bg-pink-500',
+      '游戏音乐': 'bg-purple-500',
+      '古典音乐': 'bg-amber-500',
+      '儿童音乐': 'bg-yellow-500',
+      '博歌乐音乐': 'bg-gray-500',
+      '综合音乐': 'bg-green-500',
+      '南梦宫原创音乐': 'bg-red-500',
+    }
+    return typeMap[type] || ''
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-8 mx-auto my-8 w-full max-w-screen-xl text-dark">
+      <div className="space-y-4 bg-white/50 p-4 border-2 border-white rounded-xl ring-2 ring-amber-950 w-full">
+        {/* 搜索 */}
+        <div className="relative flex items-center">
+          <SearchIcon className="absolute ml-4" />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            type="text"
+            placeholder="搜索曲目咚~"
+            className="bg-white p-4 pl-12 border-2 border-white rounded-xl outline-none ring-2 ring-amber-950 w-full"
+          />
+        </div>
+        {/* 筛选与排序 */}
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <p className="w-15">分类</p>
+            <div className="flex flex-wrap flex-1 gap-x-2 gap-y-1 min-w-0">
+              {types.map((type) => (
+                <p
+                  key={type}
+                  onClick={() => setSelectedType(type)}
+                  className={`text-amber-950 px-2 py-0.5 rounded cursor-pointer transition-colors hover:bg-amber-400/50 ${
+                    selectedType === type ? 'text-border !bg-amber-400 text-white' : ''
+                  }`}
+                >
+                  {type}
+                </p>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center">
+            <p className="w-15">排序</p>
+            <div className="flex flex-wrap flex-1 gap-x-2 gap-y-1 min-w-0">
+              {sorts.map((sort, index) => (
+                <div
+                  key={sort}
+                  onClick={() => selectSort(sort)}
+                  className={`text-amber-950 px-2 py-0.5 rounded cursor-pointer transition-colors flex items-center hover:bg-amber-400/50 ${
+                    selectedSort === sort ? 'text-border !bg-amber-400 text-white' : ''
+                  }`}
+                >
+                  <p>{sort}</p>
+                  {index > 0 && selectedSort === sort && sortDirection === 'desc' && (
+                    <ChevronDown className="opacity-50 w-5 !text-amber-950" />
+                  )}
+                  {index > 0 && selectedSort === sort && sortDirection === 'asc' && (
+                    <ChevronUp className="opacity-50 w-5 !text-amber-950" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-2 bg-blue-200 shadow px-4 py-2 rounded-full text-sm">
+        <Info className="w-5" />
+        <p>查找到 {filteredSongs.length} 条数据</p>
+      </div>
+      <div className="w-full">
+        {filteredSongs.map((song: any) => (
+          <div
+            key={song.sort}
+            onClick={() => handleOpenDetail(song.id, song.level_5 && song.level_5 !== '-' ? 5 : 4)}
+            className="p-4 rounded-xl flex flex-col gap-1 justify-between [content-visibility:auto] transition-colors hover:(bg-black/5) md:(flex-row items-center)"
+          >
+            <div className="flex items-center space-x-2">
+              <p
+                className={`text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white ${getTypeClass(song.type)}`}
+              >
+                {song.type.replace('音乐', '')}
+              </p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xl">{song.song_name}</p>
+                {song.subtitle && <p className="text-gray-500 text-sm">{song.subtitle}</p>}
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              {[1, 2, 3, 4, 5].map((i) => {
+                const levelValue = (song as any)[`level_${i}`]
+                const hasLevel = levelValue && levelValue !== '-'
+                return (
+                  <div
+                    key={i}
+                    onClick={(e) => {
+                      if (hasLevel) {
+                        e.stopPropagation()
+                        handleOpenDetail(song.id, i)
+                      }
+                    }}
+                    className={`relative w-15 h-10 rounded-lg border-2 border-white overflow-hidden ${
+                      i === 1 ? 'bg-red-300' :
+                      i === 2 ? 'bg-lime-300' :
+                      i === 3 ? 'bg-blue-300' :
+                      i === 4 ? 'bg-pink-300' : 'bg-purple-300'
+                    } ${hasLevel ? 'cursor-pointer transition-all hover:(ring-2 ring-amber-950)' : ''}`}
+                  >
+                    <div className="absolute bg-gradient-to-b from-white/50 to-transparent w-full h-full"></div>
+                    <div className="relative flex justify-center items-center space-x-1 w-full h-full">
+                      <img className="w-6" src={`/img/level/level_${i}.png`} alt="" />
+                      <p className="text-border font-bold text-white text-xl">{levelValue || '-'}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default Search

@@ -1,0 +1,20 @@
+@font-face {
+  font-family: ChillRoundF;
+  src: url('/font/ChillRoundF.woff2') format('woff2');
+}
+
+html {
+  scrollbar-width: thin;
+}
+
+body {
+  font-family: ChillRoundF, sans-serif;
+}
+
+.text-border {
+  text-shadow: -1px -1px 1px #451a03, 1px -1px 1px #451a03, -1px 1px 1px #451a03, 1px 1px 1px #451a03;
+}
+
+dialog::backdrop {
+  display: none;
+}
