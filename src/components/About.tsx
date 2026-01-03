@@ -11,7 +11,9 @@ const About: React.FC<AboutProps> = ({ visible, onVisibleChange }) => {
 
   useEffect(() => {
     if (visible && dialogRef.current) {
-      dialogRef.current.show()
+      dialogRef.current.showModal()
+    } else if (!visible && dialogRef.current && dialogRef.current.open) {
+      dialogRef.current.close()
     }
   }, [visible])
 

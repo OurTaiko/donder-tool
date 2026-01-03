@@ -21,8 +21,8 @@ const TogglePublicDialog: React.FC<TogglePublicDialogProps> = ({
 
   useEffect(() => {
     if (visible && dialogRef.current) {
-      dialogRef.current.show()
-    } else if (!visible && dialogRef.current) {
+      dialogRef.current.showModal()
+    } else if (!visible && dialogRef.current && dialogRef.current.open) {
       dialogRef.current.close()
     }
   }, [visible])

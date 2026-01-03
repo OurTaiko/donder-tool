@@ -24,7 +24,9 @@ const Detail: React.FC<DetailProps> = ({
 
   useEffect(() => {
     if (visible && dialogRef.current) {
-      dialogRef.current.show()
+      dialogRef.current.showModal()
+    } else if (!visible && dialogRef.current && dialogRef.current.open) {
+      dialogRef.current.close()
     }
   }, [visible])
 
@@ -94,8 +96,8 @@ const Detail: React.FC<DetailProps> = ({
   if (!data) return null
 
   return (
-    <dialog ref={dialogRef} onClick={closeDialog} className="top-0 z-1 fixed flex bg-black/50 w-full h-full">
-      <div onClick={(e) => e.stopPropagation()} className="relative flex bg-white shadow-xl m-auto rounded-xl w-200 max-w-full max-h-[calc(100%-4rem)] overflow-hidden dialog-content">
+    <dialog ref={dialogRef} onClick={closeDialog} className="z-50 fixed inset-0 flex bg-black/50 m-0 p-0 w-full max-w-full h-full max-h-full">
+      <div onClick={(e) => e.stopPropagation()} className="relative flex bg-white shadow-xl m-auto rounded-xl w-200 max-w-[90%] max-h-[calc(100%-4rem)] overflow-hidden dialog-content">
         <div className="top-4 right-4 absolute">
           <button onClick={closeDialog} className="hover:bg-gray-200 p-2 rounded-full transition-colors">
             <X className="w-6 h-6 text-gray-600" />

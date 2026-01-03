@@ -15,6 +15,10 @@ body {
   text-shadow: -1px -1px 1px #451a03, 1px -1px 1px #451a03, -1px 1px 1px #451a03, 1px 1px 1px #451a03;
 }
 
+dialog {
+  border: none;
+}
+
 dialog::backdrop {
-  display: none;
+  background-color: rgba(0, 0, 0, 0.5);
 }
