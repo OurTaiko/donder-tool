@@ -325,7 +325,8 @@ const Score: React.FC = () => {
             setTimeout(() => setIsComponentReady(true), 100)
         }
         loadInitialScores()
-    }, [setScores, setUserId])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     return (
         <div className="flex flex-col items-center gap-8 mx-auto my-8 w-full max-w-screen-xl text-dark">

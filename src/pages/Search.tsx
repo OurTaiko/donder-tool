@@ -14,7 +14,8 @@ const Search: React.FC = () => {
       setTimeout(() => setIsComponentReady(true), 100)
     }
     loadData()
-  }, [fetchSongData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
   const [selectedType, setSelectedType] = useState('全部')
