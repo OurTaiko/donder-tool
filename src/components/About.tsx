@@ -34,7 +34,7 @@ const About: React.FC<AboutProps> = ({ visible, onVisibleChange }) => {
           <h2 className="mb-4 text-amber-900 text-2xl">关于 Donder 查分器</h2>
 
           <div className="space-y-1 mb-4 text-gray-700">
-            <p>源代码 <a href="https://github.com/luluxia/donder-tool" target="_blank" rel="noreferrer" className="text-blue">luluxia/donder-tool</a></p>
+            <p>源代码 <a href="https://github.com/kirisamevanilla/donder-tool" target="_blank" rel="noreferrer" className="text-blue">kirisamevanilla/donder-tool</a></p>
             <p>图片素材 <a href="https://www.spriters-resource.com/arcade/taikonotatsujin2020version/" target="_blank" rel="noreferrer" className="text-blue">spriters-resource.com</a></p>
           </div>
           
