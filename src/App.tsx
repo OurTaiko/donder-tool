@@ -16,7 +16,6 @@ const App: React.FC = () => {
     detailSongId, 
     detailLevel,
     setDetailLevel,
-    songData, 
     setScrollContainer 
   } = useAppContext()
 
@@ -28,10 +27,6 @@ const App: React.FC = () => {
       setScrollContainer(scrollContainerRef.current)
     }
   }, [setScrollContainer])
-
-  if (!songData) {
-    return null
-  }
 
   return (
     <>

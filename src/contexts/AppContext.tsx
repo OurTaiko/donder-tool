@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import axios from 'axios'
 
 interface AppContextType {
@@ -11,6 +11,8 @@ interface AppContextType {
   detailLevel: number | undefined
   setDetailLevel: (level: number | undefined) => void
   songData: any[] | undefined
+  songDataLoading: boolean
+  fetchSongData: () => Promise<void>
   userId: number | null
   setUserId: (id: number | null) => void
   scores: any[]
@@ -33,15 +35,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [detailSongId, setDetailSongId] = useState<number | undefined>()
   const [detailLevel, setDetailLevel] = useState<number | undefined>()
   const [songData, setSongData] = useState<any[] | undefined>()
+  const [songDataLoading, setSongDataLoading] = useState(false)
   const [userId, setUserId] = useState<number | null>(null)
   const [scores, setScores] = useState<any[]>([])
 
-  useEffect(() => {
-    const fetchSongData = async () => {
+  const fetchSongData = useCallback(async () => {
+    if (songData || songDataLoading) return
+    setSongDataLoading(true)
+    try {
       const songResponse = await axios.get('https://cdn.ourtaiko.org/api/cnsongs')
       setSongData(songResponse.data)
+    } catch (error) {
+      console.error('Failed to fetch song data:', error)
+    } finally {
+      setSongDataLoading(false)
     }
+  }, [songData, songDataLoading])
 
+  useEffect(() => {
     const storedUserId = localStorage.getItem('userId')
     if (storedUserId) {
       setUserId(Number(storedUserId))
@@ -51,8 +62,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
     }
-
-    fetchSongData()
   }, [])
 
   const value: AppContextType = {
@@ -65,6 +74,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     detailLevel,
     setDetailLevel,
     songData,
+    songDataLoading,
+    fetchSongData,
     userId,
     setUserId,
     scores,

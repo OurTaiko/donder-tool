@@ -1,9 +1,20 @@
-import React, { useState, useMemo } from 'react'
-import { Search as SearchIcon, Info, ChevronDown, ChevronUp } from 'lucide-react'
+import React, { useState, useMemo, useEffect } from 'react'
+import { Search as SearchIcon, Info, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { useAppContext } from '../contexts/AppContext'
 
 const Search: React.FC = () => {
-  const { songData, setDetailVisible, setDetailSongId, setDetailLevel } = useAppContext()
+  const { songData, songDataLoading, fetchSongData, setDetailVisible, setDetailSongId, setDetailLevel } = useAppContext()
+  const [isComponentReady, setIsComponentReady] = useState(false)
+
+  useEffect(() => {
+    setIsComponentReady(false)
+    const loadData = async () => {
+      await fetchSongData()
+      // 给一个短暂的延迟让加载动画显示
+      setTimeout(() => setIsComponentReady(true), 100)
+    }
+    loadData()
+  }, [fetchSongData])
 
   const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
   const [selectedType, setSelectedType] = useState('全部')
@@ -94,7 +105,18 @@ const Search: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-8 mx-auto my-8 w-full max-w-screen-xl text-dark">
-      <div className="space-y-4 bg-white/50 p-4 border-2 border-white rounded-xl ring-2 ring-amber-950 w-full">
+      {!isComponentReady || songDataLoading || !songData ? (
+        <div className="flex flex-col justify-center items-center space-y-4 py-20">
+          <Loader2 className="w-12 h-12 text-amber-500 animate-spin" />
+          <p className="text-gray-600 text-lg">正在加载曲目数据咚~</p>
+        </div>
+      ) : songData.length === 0 ? (
+        <div className="flex justify-center items-center py-20">
+          <p className="text-gray-600 text-lg">暂无曲目数据咚~</p>
+        </div>
+      ) : (
+        <>
+          <div className="space-y-4 bg-white/50 p-4 border-2 border-white rounded-xl ring-2 ring-amber-950 w-full">
         {/* 搜索 */}
         <div className="relative flex items-center">
           <SearchIcon className="absolute ml-4" />
@@ -202,6 +224,8 @@ const Search: React.FC = () => {
           </div>
         ))}
       </div>
+        </>
+      )}
     </div>
   )
 }
