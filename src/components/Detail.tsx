@@ -20,15 +20,18 @@ const Detail: React.FC<DetailProps> = ({
   onSelectLevelChange,
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const { songData, scores } = useAppContext()
+  const { songData, scores, fetchSongData } = useAppContext()
 
   useEffect(() => {
-    if (visible && dialogRef.current) {
-      dialogRef.current.showModal()
+    if (visible) {
+      fetchSongData()
+      if (dialogRef.current) {
+        dialogRef.current.showModal()
+      }
     } else if (!visible && dialogRef.current && dialogRef.current.open) {
       dialogRef.current.close()
     }
-  }, [visible])
+  }, [visible, fetchSongData])
 
   const closeDialog = () => {
     onVisibleChange(false)
