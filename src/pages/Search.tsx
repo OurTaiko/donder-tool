@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useDeferredValue } from 'react'
 import { Search as SearchIcon, Info, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { useAppContext } from '../contexts/AppContext'
 import { Virtuoso } from 'react-virtuoso'
+import SongTypeTag from '../components/SongTypeTag'
 
 const Search: React.FC = () => {
   const { songData, songDataLoading, fetchSongData, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
@@ -92,20 +93,6 @@ const Search: React.FC = () => {
     setDetailVisible(true)
   }
 
-  const getTypeClass = (type: string) => {
-    const typeMap: Record<string, string> = {
-      '流行音乐': 'bg-blue-500',
-      '动漫音乐': 'bg-pink-500',
-      '游戏音乐': 'bg-purple-500',
-      '古典音乐': 'bg-amber-500',
-      '儿童音乐': 'bg-yellow-500',
-      '博歌乐音乐': 'bg-gray-500',
-      '综合音乐': 'bg-green-500',
-      '南梦宫原创音乐': 'bg-red-500',
-    }
-    return typeMap[type] || ''
-  }
-
   return (
     <div className="flex flex-col items-center gap-8 mx-auto my-8 w-full max-w-screen-xl text-dark">
       {!isComponentReady || songDataLoading || !songData ? (
@@ -188,11 +175,7 @@ const Search: React.FC = () => {
                 className="p-4 rounded-xl flex flex-col gap-1 justify-between transition-colors hover:(bg-black/5) md:(flex-row items-center)"
               >
                 <div className="flex items-center space-x-2">
-                  <p
-                    className={`text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white ${getTypeClass(song.type)}`}
-                  >
-                    {song.type.replace('音乐', '')}
-                  </p>
+                  <SongTypeTag type={song.type} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xl">{song.song_name}</p>
                     {song.subtitle && <p className="text-gray-500 text-sm">{song.subtitle}</p>}
