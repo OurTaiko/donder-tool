@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useDeferredValue } from 'react'
 import { Search as SearchIcon, Info, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { useAppContext } from '../contexts/AppContext'
 
@@ -24,6 +24,7 @@ const Search: React.FC = () => {
   const [selectedSort, setSelectedSort] = useState('默认')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [searchQuery, setSearchQuery] = useState('')
+  const deferredSearchQuery = useDeferredValue(searchQuery)
 
   const selectSort = (sort: string) => {
     if (sort === '默认') {
@@ -42,8 +43,8 @@ const Search: React.FC = () => {
     let filtered = songData || []
 
     // 搜索
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+    if (deferredSearchQuery) {
+      const query = deferredSearchQuery.toLowerCase()
       filtered = filtered.filter((song: any) =>
         song.song_name.toLowerCase().includes(query) ||
         (song.subtitle && typeof song.subtitle === 'string' && song.subtitle.toLowerCase().includes(query)) ||
@@ -82,7 +83,7 @@ const Search: React.FC = () => {
     }
 
     return filtered
-  }, [songData, searchQuery, selectedType, selectedSort, sortDirection])
+  }, [songData, deferredSearchQuery, selectedType, selectedSort, sortDirection])
 
   const handleOpenDetail = (songId: number, level: number) => {
     setDetailSongId(songId)

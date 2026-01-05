@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useDeferredValue } from 'react'
 import { Search as SearchIcon, Info, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import Button from '../components/Button'
 import TogglePublicDialog from '../components/TogglePublicDialog'
@@ -26,6 +26,7 @@ const Score: React.FC = () => {
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
     const [searchQuery, setSearchQuery] = useState('')
+    const deferredSearchQuery = useDeferredValue(searchQuery)
     const [bindLoading, setBindLoading] = useState(false)
     const [authHintVisible, setAuthHintVisible] = useState(false)
     const [updateTime, setUpdateTime] = useState('')
@@ -180,8 +181,8 @@ const Score: React.FC = () => {
     const filteredScores = useMemo(() => {
         let filtered = scores
 
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase()
+        if (deferredSearchQuery) {
+            const query = deferredSearchQuery.toLowerCase()
             filtered = filtered.filter((score: any) =>
                 score.song_detail?.song_name?.toLowerCase().includes(query) ||
                 score.song_detail?.subtitle?.toLowerCase().includes(query) ||
@@ -282,7 +283,7 @@ const Score: React.FC = () => {
                 crown,
             }
         })
-    }, [scores, searchQuery, selectedType, selectedLevel, selectedCrown, selectedRank, selectedSort, sortDirection])
+    }, [scores, deferredSearchQuery, selectedType, selectedLevel, selectedCrown, selectedRank, selectedSort, sortDirection])
 
     const handleOpenDetail = (songId: number, level: number) => {
         setDetailSongId(songId)
