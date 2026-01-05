@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect, useDeferredValue } from 'react'
 import { Search as SearchIcon, Info, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { useAppContext } from '../contexts/AppContext'
+import { Virtuoso } from 'react-virtuoso'
 
 const Search: React.FC = () => {
-  const { songData, songDataLoading, fetchSongData, setDetailVisible, setDetailSongId, setDetailLevel } = useAppContext()
+  const { songData, songDataLoading, fetchSongData, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
   const [isComponentReady, setIsComponentReady] = useState(false)
 
   useEffect(() => {
@@ -177,54 +178,59 @@ const Search: React.FC = () => {
         <p>查找到 {filteredSongs.length} 条数据</p>
       </div>
       <div className="w-full">
-        {filteredSongs.map((song: any) => (
-          <div
-            key={song.sort}
-            onClick={() => handleOpenDetail(song.id, song.level_5 && song.level_5 !== '-' ? 5 : 4)}
-            className="p-4 rounded-xl flex flex-col gap-1 justify-between [content-visibility:auto] transition-colors hover:(bg-black/5) md:(flex-row items-center)"
-          >
-            <div className="flex items-center space-x-2">
-              <p
-                className={`text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white ${getTypeClass(song.type)}`}
+        <Virtuoso
+          customScrollParent={scrollContainer || undefined}
+          data={filteredSongs}
+          itemContent={(_, song: any) => (
+            <div className="pb-4">
+              <div
+                onClick={() => handleOpenDetail(song.id, song.level_5 && song.level_5 !== '-' ? 5 : 4)}
+                className="p-4 rounded-xl flex flex-col gap-1 justify-between transition-colors hover:(bg-black/5) md:(flex-row items-center)"
               >
-                {song.type.replace('音乐', '')}
-              </p>
-              <div className="flex-1 min-w-0">
-                <p className="text-xl">{song.song_name}</p>
-                {song.subtitle && <p className="text-gray-500 text-sm">{song.subtitle}</p>}
+                <div className="flex items-center space-x-2">
+                  <p
+                    className={`text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white ${getTypeClass(song.type)}`}
+                  >
+                    {song.type.replace('音乐', '')}
+                  </p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xl">{song.song_name}</p>
+                    {song.subtitle && <p className="text-gray-500 text-sm">{song.subtitle}</p>}
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  {[1, 2, 3, 4, 5].map((i) => {
+                    const levelValue = (song as any)[`level_${i}`]
+                    const hasLevel = levelValue && levelValue !== '-'
+                    return (
+                      <div
+                        key={i}
+                        onClick={(e) => {
+                          if (hasLevel) {
+                            e.stopPropagation()
+                            handleOpenDetail(song.id, i)
+                          }
+                        }}
+                        className={`relative w-15 h-10 rounded-lg border-2 border-white overflow-hidden ${
+                          i === 1 ? 'bg-red-300' :
+                          i === 2 ? 'bg-lime-300' :
+                          i === 3 ? 'bg-blue-300' :
+                          i === 4 ? 'bg-pink-300' : 'bg-purple-300'
+                        } ${hasLevel ? 'cursor-pointer transition-all hover:(ring-2 ring-amber-950)' : ''}`}
+                      >
+                        <div className="absolute bg-gradient-to-b from-white/50 to-transparent w-full h-full"></div>
+                        <div className="relative flex justify-center items-center space-x-1 w-full h-full">
+                          <img className="w-6" src={`/img/level/level_${i}.png`} alt="" />
+                          <p className="text-border font-bold text-white text-xl">{levelValue || '-'}</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
-            <div className="flex space-x-2">
-              {[1, 2, 3, 4, 5].map((i) => {
-                const levelValue = (song as any)[`level_${i}`]
-                const hasLevel = levelValue && levelValue !== '-'
-                return (
-                  <div
-                    key={i}
-                    onClick={(e) => {
-                      if (hasLevel) {
-                        e.stopPropagation()
-                        handleOpenDetail(song.id, i)
-                      }
-                    }}
-                    className={`relative w-15 h-10 rounded-lg border-2 border-white overflow-hidden ${
-                      i === 1 ? 'bg-red-300' :
-                      i === 2 ? 'bg-lime-300' :
-                      i === 3 ? 'bg-blue-300' :
-                      i === 4 ? 'bg-pink-300' : 'bg-purple-300'
-                    } ${hasLevel ? 'cursor-pointer transition-all hover:(ring-2 ring-amber-950)' : ''}`}
-                  >
-                    <div className="absolute bg-gradient-to-b from-white/50 to-transparent w-full h-full"></div>
-                    <div className="relative flex justify-center items-center space-x-1 w-full h-full">
-                      <img className="w-6" src={`/img/level/level_${i}.png`} alt="" />
-                      <p className="text-border font-bold text-white text-xl">{levelValue || '-'}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        ))}
+          )}
+        />
       </div>
         </>
       )}

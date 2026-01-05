@@ -5,9 +5,10 @@ import TogglePublicDialog from '../components/TogglePublicDialog'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { useAppContext } from '../contexts/AppContext'
+import { Virtuoso } from 'react-virtuoso'
 
 const Score: React.FC = () => {
-    const { userId, setUserId, scores, setScores, setDetailVisible, setDetailSongId, setDetailLevel } = useAppContext()
+    const { userId, setUserId, scores, setScores, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
 
     const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
     const [selectedType, setSelectedType] = useState('全部')
@@ -478,47 +479,52 @@ const Score: React.FC = () => {
                         <p>查找到 {filteredScores.length} 条数据</p>
                     </div>
                     <div className="w-full">
-                        {filteredScores.map((score: any, index: number) => (
-                            <div
-                                key={index}
-                                onClick={() => handleOpenDetail(score.songId, score.level)}
-                                className="p-4 rounded-xl flex flex-col gap-1 justify-between [content-visibility:auto] transition-colors hover:(bg-black/5) md:(flex-row items-center)"
-                            >
-                                <div className="flex items-center space-x-2">
-                                    {score.type && (
-                                        <p className={`text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white ${getTypeClass(score.type)}`}>
-                                            {score.type.replace('音乐', '')}
-                                        </p>
-                                    )}
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-xl">{score.song_name}</p>
-                                        {score.subtitle && <p className="text-gray-500 text-sm">{score.subtitle}</p>}
-                                    </div>
-                                </div>
-                                <div className="flex space-x-4 items-center justify-end w-75 rounded-xl mx-auto bg-black/5 p-2 md:(mx-0 p-0 bg-transparent)">
-                                    {score.crown && <img className="w-10" src={`/img/crown/crown_${score.crown}.png`} alt="" />}
-                                    <img className="w-10" src={`/img/score_badge/score_${score.best_score_rank}.png`} alt="" />
-                                    <div>
-                                        <p className="text-border w-24 font-bold text-white text-2xl text-center">{score.high_score}</p>
-                                    </div>
+                        <Virtuoso
+                            customScrollParent={scrollContainer || undefined}
+                            data={filteredScores}
+                            itemContent={(_, score: any) => (
+                                <div className="pb-4">
                                     <div
-                                        className={`relative w-15 h-10 rounded-lg border-2 border-white ${score.level === 1 ? 'bg-red-300' :
-                                                score.level === 2 ? 'bg-lime-300' :
-                                                    score.level === 3 ? 'bg-blue-300' :
-                                                        score.level === 4 ? 'bg-pink-300' : 'bg-purple-300'
-                                            }`}
+                                        onClick={() => handleOpenDetail(score.songId, score.level)}
+                                        className="p-4 rounded-xl flex flex-col gap-1 justify-between transition-colors hover:(bg-black/5) md:(flex-row items-center)"
                                     >
-                                        <div className="absolute bg-gradient-to-b from-white/50 to-transparent w-full h-full"></div>
-                                        <div className="relative flex justify-center items-center space-x-1 w-full h-full">
-                                            <img className="w-6" src={`/img/level/level_${score.level}.png`} alt="" />
-                                            <p className="text-border font-bold text-white text-xl">
-                                                {(score as any)[`level_${score.level}`] || '-'}
-                                            </p>
+                                        <div className="flex items-center space-x-2">
+                                            {score.type && (
+                                                <p className={`text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white ${getTypeClass(score.type)}`}>
+                                                    {score.type.replace('音乐', '')}
+                                                </p>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xl">{score.song_name}</p>
+                                                {score.subtitle && <p className="text-gray-500 text-sm">{score.subtitle}</p>}
+                                            </div>
+                                        </div>
+                                        <div className="flex space-x-4 items-center justify-end w-75 rounded-xl mx-auto bg-black/5 p-2 md:(mx-0 p-0 bg-transparent)">
+                                            {score.crown && <img className="w-10" src={`/img/crown/crown_${score.crown}.png`} alt="" />}
+                                            <img className="w-10" src={`/img/score_badge/score_${score.best_score_rank}.png`} alt="" />
+                                            <div>
+                                                <p className="text-border w-24 font-bold text-white text-2xl text-center">{score.high_score}</p>
+                                            </div>
+                                            <div
+                                                className={`relative w-15 h-10 rounded-lg border-2 border-white ${score.level === 1 ? 'bg-red-300' :
+                                                        score.level === 2 ? 'bg-lime-300' :
+                                                            score.level === 3 ? 'bg-blue-300' :
+                                                                score.level === 4 ? 'bg-pink-300' : 'bg-purple-300'
+                                                    }`}
+                                            >
+                                                <div className="absolute bg-gradient-to-b from-white/50 to-transparent w-full h-full"></div>
+                                                <div className="relative flex justify-center items-center space-x-1 w-full h-full">
+                                                    <img className="w-6" src={`/img/level/level_${score.level}.png`} alt="" />
+                                                    <p className="text-border font-bold text-white text-xl">
+                                                        {(score as any)[`level_${score.level}`] || '-'}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            )}
+                        />
                     </div>
                     {togglePublicDialogVisible && (
                         <TogglePublicDialog
