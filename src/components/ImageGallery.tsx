@@ -144,6 +144,10 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
         e.stopPropagation()
         onClose()
       }}
+      onTouchEnd={(e) => {
+        e.stopPropagation()
+        e.preventDefault()
+      }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
@@ -151,6 +155,11 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
       <button
         onClick={(e) => {
           e.stopPropagation()
+          onClose()
+        }}
+        onTouchEnd={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
           onClose()
         }}
         className="top-4 right-4 z-10 absolute hover:bg-white/20 p-2 rounded-full transition-colors"
