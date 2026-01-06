@@ -16,7 +16,9 @@ const App: React.FC = () => {
     detailSongId, 
     detailLevel,
     setDetailLevel,
-    setScrollContainer 
+    setScrollContainer,
+    songData,
+    scores
   } = useAppContext()
 
   const [aboutVisible, setAboutVisible] = useState(false)
@@ -90,6 +92,8 @@ const App: React.FC = () => {
           songId={detailSongId}
           selectLevel={detailLevel}
           onSelectLevelChange={setDetailLevel}
+          songData={songData}
+          scores={scores}
         />
       )}
       {aboutVisible && (

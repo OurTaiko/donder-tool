@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useMemo } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import Button from './Button'
-import { useAppContext } from '../contexts/AppContext'
 import { Song } from '../types/Song'
 
 interface DetailProps {
@@ -11,6 +10,8 @@ interface DetailProps {
   songId: number
   selectLevel: number
   onSelectLevelChange: (level: number) => void
+  songData: Song[] | undefined
+  scores: any[]
 }
 
 const Detail: React.FC<DetailProps> = ({
@@ -19,20 +20,20 @@ const Detail: React.FC<DetailProps> = ({
   songId,
   selectLevel,
   onSelectLevelChange,
+  songData,
+  scores,
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const { songData, scores, fetchSongData } = useAppContext()
 
   useEffect(() => {
     if (visible) {
-      fetchSongData()
       if (dialogRef.current) {
         dialogRef.current.showModal()
       }
     } else if (!visible && dialogRef.current && dialogRef.current.open) {
       dialogRef.current.close()
     }
-  }, [visible, fetchSongData])
+  }, [visible])
 
   const closeDialog = () => {
     onVisibleChange(false)
