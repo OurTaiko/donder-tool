@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import axios from 'axios'
 import { RawToSong, Song } from '../types/Song'
+import { RawToScore, Score } from '../types/Score'
 
 interface AppContextType {
   scrollContainer: HTMLElement | null
@@ -16,8 +17,8 @@ interface AppContextType {
   fetchSongData: () => Promise<void>
   userId: number | null
   setUserId: (id: number | null) => void
-  scores: any[]
-  setScores: (scores: any[]) => void
+  scores: Score[]
+  setScores: (scores: Score[]) => void
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -38,7 +39,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [songData, setSongData] = useState<Song[] | undefined>()
   const [songDataLoading, setSongDataLoading] = useState(false)
   const [userId, setUserId] = useState<number | null>(null)
-  const [scores, setScores] = useState<any[]>([])
+  const [scores, setScores] = useState<Score[]>([])
 
   const fetchSongData = useCallback(async () => {
     if (songData || songDataLoading) return
@@ -74,7 +75,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           const resData = res.data.score
           if (resData) {
             const scoresData = JSON.parse(resData.data)
-            setScores(scoresData)
+            setScores(scoresData.map(RawToScore))
           }
         } catch (error) {
           console.error('Failed to load scores:', error)

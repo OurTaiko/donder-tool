@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import Button from './Button'
 import ImageGallery from './ImageGallery'
 import { Song } from '../types/Song'
+import { IsAP, IsClear, IsFC, Score } from '../types/Score'
 
 interface DetailProps {
   visible: boolean
@@ -12,7 +13,7 @@ interface DetailProps {
   selectLevel: number
   onSelectLevelChange: (level: number) => void
   songData: Song[] | undefined
-  scores: any[]
+  scores: Score[]
 }
 
 const Detail: React.FC<DetailProps> = ({
@@ -45,7 +46,7 @@ const Detail: React.FC<DetailProps> = ({
 
   const data = useMemo(() => {
     const cn = songData?.find((item: Song) => item.id === songId)
-    const score = scores?.find((s: any) => s.song_no === songId && s.level === selectLevel)
+    const score = scores?.find((s: Score) => s.song_no === songId && s.level === selectLevel)
 
     return {
       type: cn?.type || '',
@@ -223,30 +224,30 @@ const Detail: React.FC<DetailProps> = ({
                         <img className="m-auto w-15" src={`/img/score_badge/score_${data.score?.best_score_rank}.png`} alt="" />
                       </div>
                       <div className="flex">
-                        <img className="m-auto w-15" src={`/img/crown/crown_${data.score?.full_combo_cnt > 0 ? 'gold' : 'silver'}.png`} alt="" />
+                        <img className="m-auto w-15" src={`/img/crown/crown_${IsAP(data.score) ? 'rainbow' : IsFC(data.score) ? 'gold' : 'silver'}.png`} alt="" />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-1 text-border text-white">
                     <div className="flex justify-between items-center bg-gradient-to-r from-orange-400 to-gray-300 px-2 py-0.5 rounded-lg">
                       <p className="text-border text-white">良</p>
-                      <p>{data.score?.good_cnt}</p>
+                      <p>{data.score?.high_score_result[0]}</p>
                     </div>
                     <div className="flex justify-between items-center bg-gradient-to-r from-gray-400 to-gray-300 px-2 py-0.5 rounded-lg">
                       <p className="text-border text-white">可</p>
-                      <p>{data.score?.ok_cnt}</p>
+                      <p>{data.score?.high_score_result[1]}</p>
                     </div>
                     <div className="flex justify-between items-center bg-gradient-to-r from-blue-400 to-gray-300 px-2 py-0.5 rounded-lg">
                       <p className="text-border text-white">不可</p>
-                      <p>{data.score?.ng_cnt}</p>
+                      <p>{data.score?.high_score_result[2]}</p>
                     </div>
                     <div className="flex justify-between items-center bg-gradient-to-r from-amber-400 to-gray-300 px-2 py-0.5 rounded-lg">
                       <p className="text-border text-white">连打数</p>
-                      <p>{data.score?.pound_cnt}</p>
+                      <p>{data.score?.high_score_result[3]}</p>
                     </div>
                     <div className="flex justify-between items-center bg-gradient-to-r from-red-400 to-gray-300 px-2 py-0.5 rounded-lg">
                       <p className="text-border text-white">最大连击数</p>
-                      <p>{data.score?.combo_cnt}</p>
+                      <p>{data.score?.high_score_result[4]}</p>
                     </div>
                   </div>
                   <div className="space-y-1 col-span-2 md:col-span-1 text-border text-white">
@@ -256,19 +257,19 @@ const Detail: React.FC<DetailProps> = ({
                     <div className="gap-1 grid grid-cols-2 md:grid-cols-1">
                       <div className="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                         <p>游玩次数</p>
-                        <p>{data.score?.stage_cnt}</p>
+                        <p>{data.score?.history[0]}</p>
                       </div>
                       <div className="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                         <p>通关次数</p>
-                        <p>{data.score?.clear_cnt}</p>
+                        <p>{data.score?.history[1]}</p>
                       </div>
                       <div className="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                         <p>全连次数</p>
-                        <p>{data.score?.full_combo_cnt}</p>
+                        <p>{data.score?.history[2]}</p>
                       </div>
                       <div className="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                         <p>全良连段次数</p>
-                        <p>{data.score?.dondaful_combo_cnt}</p>
+                        <p>{data.score?.history[3]}</p>
                       </div>
                     </div>
                   </div>

@@ -6,18 +6,12 @@ import SongTypeTag from '../components/SongTypeTag'
 import { Song } from '../types/Song'
 
 const Search: React.FC = () => {
-  const { songData, songDataLoading, fetchSongData, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
+  const { songData, songDataLoading, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
   const [isComponentReady, setIsComponentReady] = useState(false)
 
   useEffect(() => {
     setIsComponentReady(false)
-    const loadData = async () => {
-      await fetchSongData()
-      // 给一个短暂的延迟让加载动画显示
-      setTimeout(() => setIsComponentReady(true), 100)
-    }
-    loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTimeout(() => setIsComponentReady(true), 100)
   }, [])
 
   const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']

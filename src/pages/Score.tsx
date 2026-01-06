@@ -7,8 +7,9 @@ import axios from 'axios'
 import { useAppContext } from '../contexts/AppContext'
 import { Virtuoso } from 'react-virtuoso'
 import SongTypeTag from '../components/SongTypeTag'
+import { IsAP, IsClear, IsFC, RawToScore, Score } from '../types/Score'
 
-const Score: React.FC = () => {
+const ScorePage: React.FC = () => {
     const { userId, setUserId, scores, setScores, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
 
     const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
@@ -55,7 +56,7 @@ const Score: React.FC = () => {
         if (!resData) {
             return { scores: [], updateTime: '' }
         }
-        const scores = JSON.parse(resData.data)
+        const scores = JSON.parse(resData.data).map(RawToScore)
         const date = new Date(resData.updated_at)
         const updateTime = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
         setIsPublic(resData.isPublic)
@@ -185,7 +186,7 @@ const Score: React.FC = () => {
 
         if (deferredSearchQuery) {
             const query = deferredSearchQuery.toLowerCase()
-            filtered = filtered.filter((score: any) =>
+            filtered = filtered.filter((score: Score) =>
                 score.song_detail?.song_name?.toLowerCase().includes(query) ||
                 score.song_detail?.subtitle?.toLowerCase().includes(query) ||
                 score.song_detail?.song_name_jp?.toLowerCase().includes(query)
@@ -193,7 +194,7 @@ const Score: React.FC = () => {
         }
 
         if (selectedType !== '全部') {
-            filtered = filtered.filter((score: any) => score.song_detail?.type === `${selectedType}音乐`)
+            filtered = filtered.filter((score: Score) => score.song_detail?.type === `${selectedType}音乐`)
         }
 
         if (selectedLevel !== '全部') {
@@ -201,15 +202,15 @@ const Score: React.FC = () => {
                 '简单': 1, '一般': 2, '困难': 3, '魔王': 4, '魔王里': 5,
             }
             const levelNum = levelMap[selectedLevel]
-            filtered = filtered.filter((score: any) => score.level === levelNum)
+            filtered = filtered.filter((score: Score) => score.level === levelNum)
         }
 
         if (selectedCrown !== '全部') {
-            filtered = filtered.filter((score: any) => {
-                if (selectedCrown === '未通关') return score.clear_cnt === 0
-                if (selectedCrown === '银冠（通关）') return score.clear_cnt > 0 && score.full_combo_cnt === 0
-                if (selectedCrown === '金冠（全连）') return score.full_combo_cnt > 0 && score.dondaful_combo_cnt === 0
-                if (selectedCrown === '虹冠（全良连段）') return score.dondaful_combo_cnt > 0
+            filtered = filtered.filter((score: Score) => {
+                if (selectedCrown === '未通关') return !IsClear(score)
+                if (selectedCrown === '银冠（通关）') return IsClear(score) && !IsFC(score)
+                if (selectedCrown === '金冠（全连）') return IsFC(score) && !IsAP(score)
+                if (selectedCrown === '虹冠（全良连段）') return IsAP(score)
                 return true
             })
         }
@@ -218,10 +219,10 @@ const Score: React.FC = () => {
             const rankMap: Record<string, string> = {
                 '白粹': '2', '铜粹': '3', '银粹': '4', '金雅': '5', '粉雅': '6', '紫雅': '7', '极': '8',
             }
-            filtered = filtered.filter((score: any) => score.best_score_rank.toString() === rankMap[selectedRank])
+            filtered = filtered.filter((score: Score) => score.best_score_rank.toString() === rankMap[selectedRank])
         }
 
-        filtered.sort((a: any, b: any) => {
+        filtered.sort((a: Score, b: Score) => {
             let aValue: any, bValue: any
 
             switch (selectedSort) {
@@ -263,11 +264,11 @@ const Score: React.FC = () => {
             return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
         })
 
-        return filtered.map((item: any) => {
+        return filtered.map((item: Score) => {
             let crown = ''
-            if (item.dondaful_combo_cnt) crown = 'rainbow'
-            else if (item.full_combo_cnt) crown = 'gold'
-            else if (item.clear_cnt) crown = 'silver'
+            if (IsAP(item)) crown = 'rainbow'
+            else if (IsFC(item)) crown = 'gold'
+            else if (IsClear(item)) crown = 'silver'
 
             return {
                 songId: item.song_no,
@@ -526,4 +527,4 @@ const Score: React.FC = () => {
     )
 }
 
-export default Score
+export default ScorePage

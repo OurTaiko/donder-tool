@@ -18,11 +18,16 @@ const App: React.FC = () => {
     setDetailLevel,
     setScrollContainer,
     songData,
+    fetchSongData,
     scores
   } = useAppContext()
 
   const [aboutVisible, setAboutVisible] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    fetchSongData()
+  }, [])
 
   useEffect(() => {
     if (scrollContainerRef.current) {

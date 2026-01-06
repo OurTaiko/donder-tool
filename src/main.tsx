@@ -8,7 +8,7 @@ import 'virtual:uno.css'
 import '@unocss/reset/tailwind.css'
 
 const Search = lazy(() => import('./pages/Search'))
-const Score = lazy(() => import('./pages/Score'))
+const ScorePage = lazy(() => import('./pages/Score'))
 
 const PageLoader = () => (
   <div className="flex justify-center items-center w-full h-full min-h-[50vh]">
@@ -25,7 +25,7 @@ ReactDOM.createRoot(document.getElementById('app')!).render(
             <Route path="/" element={<App />}>
               <Route index element={<Navigate to="/search" replace />} />
               <Route path="search" element={<Search />} />
-              <Route path="score" element={<Score />} />
+              <Route path="score" element={<ScorePage />} />
             </Route>
           </Routes>
         </Suspense>
