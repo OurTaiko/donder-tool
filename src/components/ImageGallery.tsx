@@ -140,13 +140,19 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
   return (
     <div
       className="z-50 fixed inset-0 flex bg-black/90 m-0 p-0 w-full h-full"
-      onClick={onClose}
+      onClick={(e) => {
+        e.stopPropagation()
+        onClose()
+      }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       {/* 关闭按钮 */}
       <button
-        onClick={onClose}
+        onClick={(e) => {
+          e.stopPropagation()
+          onClose()
+        }}
         className="top-4 right-4 z-10 absolute hover:bg-white/20 p-2 rounded-full transition-colors"
       >
         <X className="w-8 h-8 text-white" />
