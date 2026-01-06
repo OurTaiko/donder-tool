@@ -281,11 +281,11 @@ const Detail: React.FC<DetailProps> = ({
               )}
             </div>
           </div>
-          <div className="flex md:flex-row flex-col gap-2 mt-4">
-            <Button onClick={loadPreviewImages} disabled={loadingPreview} className="w-full">
-              {loadingPreview ? '加载中...' : '查看谱面预览'}
+          <div className="flex flex-row gap-2 mt-4">
+            <Button onClick={loadPreviewImages} disabled={loadingPreview} className="flex-1">
+              {loadingPreview ? '加载中...' : '谱面预览'}
             </Button>
-            <Button onClick={jumpToWiki} className="w-full">Taiko Wiki</Button>
+            <Button onClick={jumpToWiki} className="flex-1">Taiko Wiki</Button>
           </div>
         </div>
       </div>

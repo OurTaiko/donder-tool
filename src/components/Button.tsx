@@ -11,7 +11,7 @@ const Button: React.FC<ButtonProps> = ({ children, disabled = false, onClick, cl
   return (
     <div
       onClick={disabled ? undefined : onClick}
-      className={`bg-gradient-to-b from-amber-200 to-amber-400 text-border text-white w-max p-2 rounded ring-2 ring-amber-950 ${
+      className={`bg-gradient-to-b from-amber-200 to-amber-400 text-border text-white w-max p-2 rounded ring-2 ring-amber-950 text-center ${
         disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:(from-amber-100 to-amber-300)'
       } ${className}`}
     >
