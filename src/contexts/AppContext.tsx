@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import axios from 'axios'
+import { RawToSong, Song } from '../types/Song'
 
 interface AppContextType {
   scrollContainer: HTMLElement | null
@@ -10,7 +11,7 @@ interface AppContextType {
   setDetailSongId: (id: number | undefined) => void
   detailLevel: number | undefined
   setDetailLevel: (level: number | undefined) => void
-  songData: any[] | undefined
+  songData: Song[] | undefined
   songDataLoading: boolean
   fetchSongData: () => Promise<void>
   userId: number | null
@@ -34,7 +35,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [detailVisible, setDetailVisible] = useState(false)
   const [detailSongId, setDetailSongId] = useState<number | undefined>()
   const [detailLevel, setDetailLevel] = useState<number | undefined>()
-  const [songData, setSongData] = useState<any[] | undefined>()
+  const [songData, setSongData] = useState<Song[] | undefined>()
   const [songDataLoading, setSongDataLoading] = useState(false)
   const [userId, setUserId] = useState<number | null>(null)
   const [scores, setScores] = useState<any[]>([])
@@ -44,7 +45,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSongDataLoading(true)
     try {
       const songResponse = await axios.get('https://cdn.ourtaiko.org/api/cnsongs')
-      setSongData(songResponse.data)
+      setSongData(songResponse.data.map(RawToSong))
     } catch (error) {
       console.error('Failed to fetch song data:', error)
     } finally {
@@ -54,13 +55,32 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId')
-    if (storedUserId) {
-      setUserId(Number(storedUserId))
-    }
-
     const token = localStorage.getItem('token')
+    
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    }
+    
+    if (storedUserId) {
+      const id = Number(storedUserId)
+      setUserId(id)
+      
+      // 加载用户成绩数据
+      const loadScores = async () => {
+        try {
+          const res = await axios.get('https://hasura.llx.life/api/rest/donder/get-score', {
+            params: { id }
+          })
+          const resData = res.data.score
+          if (resData) {
+            const scoresData = JSON.parse(resData.data)
+            setScores(scoresData)
+          }
+        } catch (error) {
+          console.error('Failed to load scores:', error)
+        }
+      }
+      loadScores()
     }
   }, [])
 

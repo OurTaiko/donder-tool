@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import Button from './Button'
 import { useAppContext } from '../contexts/AppContext'
+import { Song } from '../types/Song'
 
 interface DetailProps {
   visible: boolean
@@ -38,7 +39,7 @@ const Detail: React.FC<DetailProps> = ({
   }
 
   const data = useMemo(() => {
-    const cn = songData?.find((item: any) => item.id === songId)
+    const cn = songData?.find((item: Song) => item.id === songId)
     const score = scores?.find((s: any) => s.song_no === songId && s.level === selectLevel)
 
     return {
@@ -57,10 +58,10 @@ const Detail: React.FC<DetailProps> = ({
       })(),
       score,
       levels: (() => {
-        if (cn?.level_5 === '-') {
-          return [cn?.level_1, cn?.level_2, cn?.level_3, cn?.level_4]
+        if (cn?.levels[4] === '-') {
+          return [cn?.levels[0], cn?.levels[1], cn?.levels[2], cn?.levels[3]]
         } else {
-          return [cn?.level_1, cn?.level_2, cn?.level_3, cn?.level_4, cn?.level_5]
+          return [cn?.levels[0], cn?.levels[1], cn?.levels[2], cn?.levels[3], cn?.levels[4]]
         }
       })(),
     }

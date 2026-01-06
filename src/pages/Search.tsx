@@ -3,6 +3,7 @@ import { Search as SearchIcon, Info, ChevronDown, ChevronUp, Loader2 } from 'luc
 import { useAppContext } from '../contexts/AppContext'
 import { Virtuoso } from 'react-virtuoso'
 import SongTypeTag from '../components/SongTypeTag'
+import { Song } from '../types/Song'
 
 const Search: React.FC = () => {
   const { songData, songDataLoading, fetchSongData, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
@@ -47,7 +48,7 @@ const Search: React.FC = () => {
     // 搜索
     if (deferredSearchQuery) {
       const query = deferredSearchQuery.toLowerCase()
-      filtered = filtered.filter((song: any) =>
+      filtered = filtered.filter((song: Song) =>
         song.song_name.toLowerCase().includes(query) ||
         (song.subtitle && typeof song.subtitle === 'string' && song.subtitle.toLowerCase().includes(query)) ||
         song.song_name_jp.toLowerCase().includes(query)
@@ -56,24 +57,24 @@ const Search: React.FC = () => {
 
     // 类型筛选
     if (selectedType !== '全部') {
-      filtered = filtered.filter((song: any) => song.type === `${selectedType}音乐`)
+      filtered = filtered.filter((song: Song) => song.type === `${selectedType}音乐`)
     }
 
     // 排序
     const sortKey = selectedSort
     const multiplier = sortDirection === 'asc' ? 1 : -1
     if (sortKey === '简单') {
-      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_1)) - parseInt(String(b.level_1))))
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.levels[0])) - parseInt(String(b.levels[0]))))
     } else if (sortKey === '一般') {
-      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_2)) - parseInt(String(b.level_2))))
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.levels[1])) - parseInt(String(b.levels[1]))))
     } else if (sortKey === '困难') {
-      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_3)) - parseInt(String(b.level_3))))
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.levels[2])) - parseInt(String(b.levels[2]))))
     } else if (sortKey === '魔王') {
-      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_4)) - parseInt(String(b.level_4))))
+      filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.levels[3])) - parseInt(String(b.levels[3]))))
     } else if (sortKey === '魔王里') {
       filtered = [...filtered].sort((a, b) => {
-        const aLevel = a.level_5 && a.level_5 !== '-' ? parseInt(String(a.level_5)) : parseInt(String(a.level_4))
-        const bLevel = b.level_5 && b.level_5 !== '-' ? parseInt(String(b.level_5)) : parseInt(String(b.level_4))
+        const aLevel = a.levels[4] && a.levels[4] !== '-' ? parseInt(String(a.levels[4])) : parseInt(String(a.levels[3]))
+        const bLevel = b.levels[4] && b.levels[4] !== '-' ? parseInt(String(b.levels[4])) : parseInt(String(b.levels[3]))
         return multiplier * (aLevel - bLevel)
       })
     } else if (sortKey === '上线日期') {
@@ -168,10 +169,10 @@ const Search: React.FC = () => {
         <Virtuoso
           customScrollParent={scrollContainer || undefined}
           data={filteredSongs}
-          itemContent={(_, song: any) => (
+          itemContent={(_, song: Song) => (
             <div className="pb-4">
               <div
-                onClick={() => handleOpenDetail(song.id, song.level_5 && song.level_5 !== '-' ? 5 : 4)}
+                onClick={() => handleOpenDetail(song.id, song.levels[4] && song.levels[4] !== '-' ? 5 : 4)}
                 className="p-4 rounded-xl flex flex-col gap-1 justify-between transition-colors hover:(bg-black/5) md:(flex-row items-center)"
               >
                 <div className="flex items-center space-x-2">
@@ -183,7 +184,7 @@ const Search: React.FC = () => {
                 </div>
                 <div className="flex space-x-2">
                   {[1, 2, 3, 4, 5].map((i) => {
-                    const levelValue = (song as any)[`level_${i}`]
+                    const levelValue = song.levels[i - 1]
                     const hasLevel = levelValue && levelValue !== '-'
                     return (
                       <div

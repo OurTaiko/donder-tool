@@ -274,11 +274,13 @@ const Score: React.FC = () => {
                 type: item.song_detail?.type || '',
                 song_name: item.song_detail?.song_name || '未知曲目',
                 subtitle: item.song_detail?.subtitle || '',
-                level_1: item.song_detail?.level_1 || '-',
-                level_2: item.song_detail?.level_2 || '-',
-                level_3: item.song_detail?.level_3 || '-',
-                level_4: item.song_detail?.level_4 || '-',
-                level_5: item.song_detail?.level_5 || '-',
+                levels:[
+                  item.song_detail?.level_1 || '-',
+                  item.song_detail?.level_2 || '-',
+                  item.song_detail?.level_3 || '-',
+                  item.song_detail?.level_4 || '-',
+                  item.song_detail?.level_5 || '-',
+                ],
                 level: item.level,
                 high_score: item.high_score,
                 best_score_rank: item.best_score_rank,
@@ -296,17 +298,14 @@ const Score: React.FC = () => {
 
     useEffect(() => {
         setIsComponentReady(false)
-        const loadInitialScores = async () => {
-            if (localStorage.getItem('userId')) {
-                const storedId = Number(localStorage.getItem('userId'))
-                setUserId(storedId)
+        const loadMetadata = async () => {
+            if (userId) {
                 setScoresLoading(true)
                 try {
-                    const { scores: newScores, updateTime: newUpdateTime } = await getScore(storedId)
-                    setScores(newScores)
+                    const { updateTime: newUpdateTime } = await getScore(userId)
                     setUpdateTime(newUpdateTime)
                 } catch (error) {
-                    console.error('Failed to load scores:', error)
+                    console.error('Failed to load metadata:', error)
                 } finally {
                     setScoresLoading(false)
                 }
@@ -314,7 +313,7 @@ const Score: React.FC = () => {
             // 给一个短暂的延迟让加载动画显示
             setTimeout(() => setIsComponentReady(true), 100)
         }
-        loadInitialScores()
+        loadMetadata()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
