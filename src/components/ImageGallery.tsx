@@ -14,7 +14,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const imageRef = useRef<HTMLDivElement>(null)
-  const lastTouchDistance = useRef<number>(0)
 
   // 重置缩放和位置
   const resetTransform = () => {
@@ -47,16 +46,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
 
   // 触摸开始
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      // 双指触摸
-      const touch1 = e.touches[0]
-      const touch2 = e.touches[1]
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      )
-      lastTouchDistance.current = distance
-    } else if (e.touches.length === 1 && scale > 1) {
+    if (e.touches.length === 1 && scale > 1) {
       // 单指拖动（仅当缩放时）
       setIsDragging(true)
       setDragStart({
@@ -68,24 +58,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
 
   // 触摸移动
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      // 双指缩放
-      e.preventDefault()
-      const touch1 = e.touches[0]
-      const touch2 = e.touches[1]
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      )
-      
-      if (lastTouchDistance.current > 0) {
-        const delta = distance / lastTouchDistance.current
-        const newScale = Math.min(Math.max(scale * delta, 0.5), 5)
-        setScale(newScale)
-      }
-      
-      lastTouchDistance.current = distance
-    } else if (e.touches.length === 1 && isDragging && scale > 1) {
+    if (e.touches.length === 1 && isDragging && scale > 1) {
       // 拖动图片
       e.preventDefault()
       setPosition({
@@ -98,7 +71,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
   // 触摸结束
   const handleTouchEnd = () => {
     setIsDragging(false)
-    lastTouchDistance.current = 0
   }
 
   // 鼠标拖动开始
