@@ -281,7 +281,7 @@ const Detail: React.FC<DetailProps> = ({
               )}
             </div>
           </div>
-          <div className="space-y-2">
+          <div className="flex md:flex-row flex-col gap-2 mt-4">
             <Button onClick={loadPreviewImages} disabled={loadingPreview} className="w-full">
               {loadingPreview ? '加载中...' : '查看谱面预览'}
             </Button>
