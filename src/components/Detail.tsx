@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import Button from './Button'
+import ImageGallery from './ImageGallery'
 import { Song } from '../types/Song'
 
 interface DetailProps {
@@ -24,6 +25,9 @@ const Detail: React.FC<DetailProps> = ({
   scores,
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const [previewImages, setPreviewImages] = useState<string[]>([])
+  const [galleryVisible, setGalleryVisible] = useState(false)
+  const [loadingPreview, setLoadingPreview] = useState(false)
 
   useEffect(() => {
     if (visible) {
@@ -82,6 +86,31 @@ const Detail: React.FC<DetailProps> = ({
   const jumpToWiki = () => {
     const wikiUrl = `https://taiko.wiki/song/${songId}`
     window.open(wikiUrl, '_blank')
+  }
+
+  const loadPreviewImages = async () => {
+    setLoadingPreview(true)
+    try {
+      const response = await fetch(`https://cdn.ourtaiko.org/api/preview/${songId}`)
+      if (!response.ok) {
+        throw new Error('获取预览图片失败')
+      }
+      const previewData = await response.json()
+      const images = previewData[selectLevel.toString()] || []
+      
+      if (images.length === 0) {
+        toast.error('该难度暂无预览图片咚~')
+        return
+      }
+      
+      setPreviewImages(images)
+      setGalleryVisible(true)
+    } catch (error) {
+      console.error('加载预览图片失败:', error)
+      toast.error('加载预览图片失败咚~')
+    } finally {
+      setLoadingPreview(false)
+    }
   }
 
   const getTypeClass = (type: string) => {
@@ -252,11 +281,19 @@ const Detail: React.FC<DetailProps> = ({
               )}
             </div>
           </div>
-          <div>
-            <Button onClick={jumpToWiki} className="mt-4 w-full">Taiko Wiki</Button>
+          <div className="space-y-2">
+            <Button onClick={loadPreviewImages} disabled={loadingPreview} className="w-full">
+              {loadingPreview ? '加载中...' : '查看谱面预览'}
+            </Button>
+            <Button onClick={jumpToWiki} className="w-full">Taiko Wiki</Button>
           </div>
         </div>
       </div>
+      <ImageGallery
+        images={previewImages}
+        visible={galleryVisible}
+        onClose={() => setGalleryVisible(false)}
+      />
     </dialog>
   )
 }
