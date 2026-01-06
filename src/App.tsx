@@ -86,6 +86,16 @@ const App: React.FC = () => {
             >
               成绩查询
             </Link>
+            <Link
+              to="/difficulty"
+              className={`rounded-full px-4 py-2 transition-colors ${
+                location.pathname === '/difficulty'
+                  ? 'bg-gradient-to-b from-amber-200 to-amber-400 text-border text-white'
+                  : ''
+              }`}
+            >
+              难度表
+            </Link>
           </div>
         </div>
         <Outlet />

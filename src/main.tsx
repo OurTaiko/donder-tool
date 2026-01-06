@@ -9,6 +9,7 @@ import '@unocss/reset/tailwind.css'
 
 const Search = lazy(() => import('./pages/Search'))
 const ScorePage = lazy(() => import('./pages/Score'))
+const DifficultyChart = lazy(() => import('./pages/DifficultyChart'))
 
 const PageLoader = () => (
   <div className="flex justify-center items-center w-full h-full min-h-[50vh]">
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('app')!).render(
               <Route index element={<Navigate to="/search" replace />} />
               <Route path="search" element={<Search />} />
               <Route path="score" element={<ScorePage />} />
+              <Route path="difficulty" element={<DifficultyChart />} />
             </Route>
           </Routes>
         </Suspense>

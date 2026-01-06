@@ -106,6 +106,7 @@ const ScorePage: React.FC = () => {
             } else {
                 toast.error(res.data.error || '绑定失败，请稍后重试咚~')
             }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             toast.error(e.response?.data?.error || '绑定失败，请稍后重试咚~')
         } finally {
@@ -125,6 +126,7 @@ const ScorePage: React.FC = () => {
                 setUpdateTime(newUpdateTime)
                 toast.success('同步成功咚~')
             }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             toast.error(e.response?.data?.error || '同步失败，请稍后重试咚~')
         } finally {
@@ -174,6 +176,7 @@ const ScorePage: React.FC = () => {
             } else {
                 toast.error(res.data.error || '操作失败，请稍后重试咚~')
             }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             toast.error(e.response?.data?.error || '操作失败，请稍后重试咚~')
         } finally {
@@ -223,7 +226,7 @@ const ScorePage: React.FC = () => {
         }
 
         filtered.sort((a: Score, b: Score) => {
-            let aValue: any, bValue: any
+            let aValue: number, bValue: number
 
             switch (selectedSort) {
                 case '更新时间': {
