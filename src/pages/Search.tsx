@@ -5,7 +5,7 @@ import { Virtuoso } from 'react-virtuoso'
 import SongTypeTag from '../components/SongTypeTag'
 import { Song } from '../types/Song'
 
-const Search: React.FC = () => {
+const SearchPage: React.FC = () => {
   const { songData, songDataLoading, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
   const [isComponentReady, setIsComponentReady] = useState(false)
 
@@ -216,4 +216,4 @@ const Search: React.FC = () => {
   )
 }
 
-export default Search
+export default SearchPage

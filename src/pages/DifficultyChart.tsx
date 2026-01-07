@@ -3,9 +3,9 @@ import axios from 'axios'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { useAppContext } from '../contexts/AppContext'
 import { DifficultyChart as IDifficultyChart } from '../types/DifficultyChart'
-import { IsAP, IsFC, IsClear, Score } from '../types/Score'
+import { Score } from '../types/Score'
 
-const DifficultyChart: React.FC = () => {
+const DifficultyChartPage: React.FC = () => {
     const { songData, scores, setDetailVisible, setDetailSongId, setDetailLevel } = useAppContext()
     
     // Filters
@@ -50,17 +50,17 @@ const DifficultyChart: React.FC = () => {
     // Helper to determine status class
     const getStatusClass = (score: Score | undefined) => {
         if (!score) return 'bg-gray-100 border-gray-200'
-        if (IsAP(score)) return 'bg-gradient-to-br from-indigo-100 to-purple-100 border-purple-300 ring-2 ring-purple-200'
-        if (IsFC(score)) return 'bg-gradient-to-br from-yellow-100 to-orange-100 border-orange-300 ring-2 ring-orange-200'
-        if (IsClear(score)) return 'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-400 ring-2 ring-gray-300' // Silver-ish
+        if (score.IsAP()) return 'bg-gradient-to-br from-indigo-100 to-purple-100 border-purple-300 ring-2 ring-purple-200'
+        if (score.IsFC()) return 'bg-gradient-to-br from-yellow-100 to-orange-100 border-orange-300 ring-2 ring-orange-200'
+        if (score.IsClear()) return 'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-400 ring-2 ring-gray-300' // Silver-ish
         return 'bg-green-50 border-green-200' // Played but not cleared?
     }
     
     const getStatusLabel = (score: Score | undefined) => {
          if (!score) return null
-         if (IsAP(score)) return <img src="/img/crown/crown_rainbow.png" className="w-auto h-5 object-contain" alt="全良" />
-         if (IsFC(score)) return <img src="/img/crown/crown_gold.png" className="w-auto h-5 object-contain" alt="全连" />
-         if (IsClear(score)) return <img src="/img/crown/crown_silver.png" className="w-auto h-5 object-contain" alt="通关" />
+         if (score.IsAP()) return <img src="/img/crown/crown_rainbow.png" className="w-auto h-5 object-contain" alt="全良" />
+         if (score.IsFC()) return <img src="/img/crown/crown_gold.png" className="w-auto h-5 object-contain" alt="全连" />
+         if (score.IsClear()) return <img src="/img/crown/crown_silver.png" className="w-auto h-5 object-contain" alt="通关" />
          return <img src="/img/crown/crown_silver.png" className="opacity-0 w-auto h-5 object-contain" alt="通关" />
     }
 
@@ -138,6 +138,9 @@ const DifficultyChart: React.FC = () => {
                                         
                                         const song = songData?.find(s => s.id === songId)
                                         if (!song) return null // Song not found in metadata
+                                        if (song.levels.length < chartSong.difficulty) return null // Difficulty not available
+                                        const level = song.levels[chartSong.difficulty - 1]
+                                        if (!level || level === "-") return null // Level data missing
 
                                         const score = findScore(songId, chartSong.difficulty)
                                         const statusClass = getStatusClass(score)
@@ -185,4 +188,4 @@ const DifficultyChart: React.FC = () => {
     )
 }
 
-export default DifficultyChart
+export default DifficultyChartPage

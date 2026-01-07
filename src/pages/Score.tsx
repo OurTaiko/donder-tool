@@ -1,13 +1,13 @@
-import React, { useState, useMemo, useEffect, useDeferredValue } from 'react'
-import { Search as SearchIcon, Info, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
-import Button from '../components/Button'
-import TogglePublicDialog from '../components/TogglePublicDialog'
-import { toast } from 'sonner'
 import axios from 'axios'
-import { useAppContext } from '../contexts/AppContext'
+import { ChevronDown, ChevronUp, Info, Loader2, Search as SearchIcon } from 'lucide-react'
+import React, { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { Virtuoso } from 'react-virtuoso'
+import { toast } from 'sonner'
+import Button from '../components/Button'
 import SongTypeTag from '../components/SongTypeTag'
-import { IsAP, IsClear, IsFC, RawToScore, Score } from '../types/Score'
+import TogglePublicDialog from '../components/TogglePublicDialog'
+import { useAppContext } from '../contexts/AppContext'
+import { RawToScore, Score } from '../types/Score'
 
 const ScorePage: React.FC = () => {
     const { userId, setUserId, scores, setScores, setDetailVisible, setDetailSongId, setDetailLevel, scrollContainer } = useAppContext()
@@ -15,7 +15,7 @@ const ScorePage: React.FC = () => {
     const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
     const [selectedType, setSelectedType] = useState('全部')
 
-    const crowns = ['全部', '未通关', '银冠（通关）', '金冠（全连）', '虹冠（全良连段）']
+    const crowns = ['全部', '未通关', '银冠', '金冠', '虹冠']
     const [selectedCrown, setSelectedCrown] = useState('全部')
 
     const levels = ['全部', '简单', '一般', '困难', '魔王', '魔王里']
@@ -210,10 +210,10 @@ const ScorePage: React.FC = () => {
 
         if (selectedCrown !== '全部') {
             filtered = filtered.filter((score: Score) => {
-                if (selectedCrown === '未通关') return !IsClear(score)
-                if (selectedCrown === '银冠（通关）') return IsClear(score) && !IsFC(score)
-                if (selectedCrown === '金冠（全连）') return IsFC(score) && !IsAP(score)
-                if (selectedCrown === '虹冠（全良连段）') return IsAP(score)
+                if (selectedCrown === '未通关') return !score.IsClear()
+                if (selectedCrown === '银冠') return score.IsClear() && !score.IsFC()
+                if (selectedCrown === '金冠') return score.IsFC() && !score.IsAP()
+                if (selectedCrown === '虹冠') return score.IsAP()
                 return true
             })
         }
@@ -269,9 +269,9 @@ const ScorePage: React.FC = () => {
 
         return filtered.map((item: Score) => {
             let crown = ''
-            if (IsAP(item)) crown = 'rainbow'
-            else if (IsFC(item)) crown = 'gold'
-            else if (IsClear(item)) crown = 'silver'
+            if (item.IsAP()) crown = 'rainbow'
+            else if (item.IsFC()) crown = 'gold'
+            else if (item.IsClear()) crown = 'silver'
 
             return {
                 songId: item.song_no,

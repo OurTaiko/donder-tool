@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import Button from './Button'
 import ImageGallery from './ImageGallery'
 import { Song } from '../types/Song'
-import { IsAP, IsClear, IsFC, Score } from '../types/Score'
+import { Score } from '../types/Score'
 
 interface DetailProps {
   visible: boolean
@@ -48,13 +48,23 @@ const Detail: React.FC<DetailProps> = ({
     const cn = songData?.find((item: Song) => item.id === songId)
     const score = scores?.find((s: Score) => s.song_no === songId && s.level === selectLevel)
 
+    if (!cn) return {
+        type: '',
+        title: '',
+        titleJp: '',
+        subtitle: '',
+        openDay: '',
+        score: score,
+        levels: []
+    }
+
     return {
-      type: cn?.type || '',
-      title: cn?.song_name || '',
-      titleJp: cn?.song_name_jp || '',
-      subtitle: cn?.subtitle || '',
+      type: cn.type,
+      title: cn.song_name,
+      titleJp: cn.song_name_jp,
+      subtitle: cn.subtitle,
       openDay: (() => {
-        const dateStr = cn?.open_day || ''
+        const dateStr = cn.open_day
         const parts = dateStr.split('/')
         if (parts.length === 3) {
           const [month, day, year] = parts
@@ -63,11 +73,11 @@ const Detail: React.FC<DetailProps> = ({
         return ''
       })(),
       score,
-      levels: (() => {
-        if (cn?.levels[4] === '-') {
-          return [cn?.levels[0], cn?.levels[1], cn?.levels[2], cn?.levels[3]]
+      levels: ((): number[] => {
+        if (cn.levels[4] === '-') {
+          return [cn.levels[0], cn.levels[1], cn.levels[2], cn.levels[3]] as number[]
         } else {
-          return [cn?.levels[0], cn?.levels[1], cn?.levels[2], cn?.levels[3], cn?.levels[4]]
+          return [cn.levels[0], cn.levels[1], cn.levels[2], cn.levels[3], cn.levels[4]] as number[]
         }
       })(),
     }
@@ -184,10 +194,9 @@ const Detail: React.FC<DetailProps> = ({
               </div>
             </div>
           )}
-          {/* 谱面预览 */}
           <div>
             <div className="flex items-end space-x-1 h-10">
-              {data.levels.map((level: any, index: number) => (
+              {data.levels.map((level: number, index: number) => (
                 <div
                   key={index}
                   onClick={() => handleLevelChange(index + 1)}
@@ -224,7 +233,7 @@ const Detail: React.FC<DetailProps> = ({
                         <img className="m-auto w-15" src={`/img/score_badge/score_${data.score?.best_score_rank}.png`} alt="" />
                       </div>
                       <div className="flex">
-                        <img className="m-auto w-15" src={`/img/crown/crown_${IsAP(data.score) ? 'rainbow' : IsFC(data.score) ? 'gold' : 'silver'}.png`} alt="" />
+                        <img className="m-auto w-15" src={`/img/crown/crown_${data.score?.IsAP() ? 'rainbow' : data.score?.IsFC() ? 'gold' : 'silver'}.png`} alt="" />
                       </div>
                     </div>
                   </div>
@@ -268,7 +277,7 @@ const Detail: React.FC<DetailProps> = ({
                         <p>{data.score?.history[2]}</p>
                       </div>
                       <div className="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                        <p>全良连段次数</p>
+                        <p>全良次数</p>
                         <p>{data.score?.history[3]}</p>
                       </div>
                     </div>

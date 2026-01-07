@@ -11,6 +11,10 @@ export interface Score {
     best_score_rank: number;
     history: number[];
     song_detail: any;
+    IsAP(): boolean;
+    IsFC(): boolean;
+    IsClear(): boolean;
+    IsPlayed(): boolean;
 }
 
 interface RawScore{
@@ -48,22 +52,10 @@ export function RawToScore(raw: RawScore): Score {
         best_score_rank: raw.best_score_rank,
         high_score_result: [raw.good_cnt, raw.ok_cnt, raw.ng_cnt, raw.pound_cnt, raw.combo_cnt],
         history: [raw.stage_cnt, raw.clear_cnt, raw.full_combo_cnt, raw.dondaful_combo_cnt],
-        song_detail: raw.song_detail
+        song_detail: raw.song_detail,
+        IsAP: () => { return raw.dondaful_combo_cnt > 0; },
+        IsFC: () => { return raw.full_combo_cnt > 0; },
+        IsClear: () => { return raw.clear_cnt > 0; },
+        IsPlayed: () => { return raw.stage_cnt > 0; },
     };
-}
-
-export function IsAP(score: Score | undefined): boolean {
-    return score ? score.history[3] > 0 : false;
-}
-
-export function IsFC(score: Score | undefined): boolean {
-    return score ? score.history[2] > 0 : false;
-}
-
-export function IsClear(score: Score | undefined): boolean {
-    return score ? score.history[1] > 0 : false;
-}
-
-export function IsPlayed(score: Score | undefined): boolean {
-    return score ? score.history[0] > 0 : false;
 }
