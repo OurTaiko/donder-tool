@@ -54,24 +54,26 @@ const DifficultyChartPage: React.FC = () => {
         const toastId = toast.loading('正在生成图片...', { duration: 10000 })
         
         try {
-            // Need to wait for React to render the export header and footer
-            await new Promise(resolve => setTimeout(resolve, 800))
+            await new Promise(resolve => setTimeout(resolve, 1000))
             
             const dataUrl = await toPng(chartRef.current, {
-                width: 1200,
+                width: 2000,
                 style: {
-                    width: '1200px',
-                    maxWidth: 'none',
+                    width: '2000px',
+                    height: 'auto',
+                    minHeight: 'fit-content',
+                    maxHeight: 'none',
                     margin: '0',
-                    padding: '80px 60px',
+                    padding: '80px 80px 140px 80px',
                     backgroundColor: '#fff7ed',
-                    backgroundImage: 'linear-gradient(to bottom, #fbbf24, #fbbf24 120px, rgba(251, 191, 36, 0.1) 500px, transparent 100%), url(' + window.location.origin + '/img/bg.webp)',
+                    backgroundImage: 'linear-gradient(to bottom, #fbbf24, #fbbf24 160px, rgba(251, 191, 36, 0.1) 800px, transparent 100%), url(' + window.location.origin + '/img/bg.webp)',
                     backgroundSize: '100% 100%, cover',
                     backgroundPosition: 'center center',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     borderRadius: '0',
+                    overflow: 'visible',
                 },
                 backgroundColor: '#ffffff',
                 cacheBust: true,
@@ -179,18 +181,18 @@ const DifficultyChartPage: React.FC = () => {
              </div>
 
              {/* Content */}
-             <div className={exporting ? 'w-[1120px]' : 'w-full max-w-5xl'} ref={chartRef}>
+             <div className={exporting ? 'w-[1840px]' : 'w-full max-w-5xl'} ref={chartRef}>
                 {/* Export Header - Only visible during export via html-to-image processing */}
                 {exporting && (
-                    <div className="flex flex-col items-center mb-8 text-center">
-                        <div className="flex items-center gap-3 mb-2">
-                            <img src="/img/icon.webp" className="w-12 h-12" alt="icon" />
-                            <h1 className="font-bold text-amber-900 text-4xl">太鼓达人难度分级表</h1>
-                            <span className="bg-amber-100 px-4 py-1 rounded-full font-bold text-amber-800">BY PROBER.OURTAIKO.ORG</span>
+                    <div className="flex flex-col items-center mb-10 text-center">
+                        <div className="flex items-center gap-4 mb-2">
+                            <img src="/img/icon.webp" className="w-16 h-16" alt="icon" />
+                            <h1 className="font-bold text-amber-900 text-6xl">太鼓达人难度分级表</h1>
                         </div>
-                        <div className="flex gap-3 text-xl">
-                            <span className="bg-amber-100 px-4 py-1 rounded-full font-bold text-amber-800">等级: {selectedLevel} ★</span>
-                            <span className="bg-amber-100 px-4 py-1 rounded-full font-bold text-amber-800">目标: {types.find(t => t.value === selectedType)?.label}</span>
+                        <p className="mb-8 font-bold text-amber-900/40 text-2xl uppercase tracking-[0.3em]">prober.ourtaiko.org</p>
+                        <div className="flex gap-4 text-xl">
+                            <span className="bg-white/80 shadow-sm px-6 py-2 border border-amber-200 rounded-full font-bold text-amber-800">等级: {selectedLevel} ★</span>
+                            <span className="bg-white/80 shadow-sm px-6 py-2 border border-amber-200 rounded-full font-bold text-amber-800">目标: {types.find(t => t.value === selectedType)?.label}</span>
                         </div>
                     </div>
                 )}
@@ -211,7 +213,7 @@ const DifficultyChartPage: React.FC = () => {
                                 <h3 className="inline-block mb-4 pb-2 border-amber-200 border-b-2 font-bold text-amber-900 text-xl">
                                     {section.name}
                                 </h3>
-                                <div className={`gap-3 grid ${exporting ? 'grid-cols-5' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'}`}>
+                                <div className={`gap-4 grid ${exporting ? 'grid-cols-9' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'}`}>
                                     {section.songs.map((chartSong, sIdx) => {
                                         const songId = parseInt(chartSong.id)
                                         if (isNaN(songId)) return null
