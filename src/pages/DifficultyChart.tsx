@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle, Download } from 'lucide-react'
+import { toPng } from 'html-to-image'
+import { toast } from 'sonner'
 import { useAppContext } from '../contexts/AppContext'
 import { DifficultyChart as IDifficultyChart } from '../types/DifficultyChart'
 import { Score } from '../types/Score'
@@ -21,7 +23,10 @@ const DifficultyChartPage: React.FC = () => {
 
     const [chartData, setChartData] = useState<IDifficultyChart | null>(null)
     const [loading, setLoading] = useState(false)
+    const [exporting, setExporting] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    
+    const chartRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -41,6 +46,51 @@ const DifficultyChartPage: React.FC = () => {
 
         fetchData()
     }, [selectedLevel, selectedType])
+    
+    const handleExportImage = async () => {
+        if (!chartRef.current) return
+        
+        setExporting(true)
+        const toastId = toast.loading('正在生成图片...', { duration: 10000 })
+        
+        try {
+            // Need to wait for React to render the export header and footer
+            await new Promise(resolve => setTimeout(resolve, 800))
+            
+            const dataUrl = await toPng(chartRef.current, {
+                width: 1200,
+                style: {
+                    width: '1200px',
+                    maxWidth: 'none',
+                    margin: '0',
+                    padding: '80px 60px',
+                    backgroundColor: '#fff7ed',
+                    backgroundImage: 'linear-gradient(to bottom, #fbbf24, #fbbf24 120px, rgba(251, 191, 36, 0.1) 500px, transparent 100%), url(' + window.location.origin + '/img/bg.webp)',
+                    backgroundSize: '100% 100%, cover',
+                    backgroundPosition: 'center center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    borderRadius: '0',
+                },
+                backgroundColor: '#ffffff',
+                cacheBust: true,
+                skipAutoScale: true,
+                pixelRatio: 2,
+            })
+            
+            const link = document.createElement('a')
+            link.download = `Taiko_Difficulty_Chart_${selectedLevel}_${selectedType}.png`
+            link.href = dataUrl
+            link.click()
+            toast.success('图片已生成并开始下载', { id: toastId })
+        } catch (err) {
+            console.error('Export error:', err)
+            toast.error('生成图片时遇到错误，请重试', { id: toastId })
+        } finally {
+            setExporting(false)
+        }
+    }
     
     // Better score finding logic
     const findScore = (songId: number, difficultyNum: number) => {
@@ -111,10 +161,40 @@ const DifficultyChartPage: React.FC = () => {
                         ))}
                      </div>
                  </div>
+
+                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleExportImage}
+                        disabled={exporting || loading || !chartData}
+                        className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 shadow-sm px-4 py-1.5 rounded-lg font-medium text-white active:scale-95 transition-all"
+                    >
+                        {exporting ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Download className="w-4 h-4" />
+                        )}
+                        <span>{exporting ? '正在生成...' : '保存图片'}</span>
+                    </button>
+                 </div>
              </div>
 
              {/* Content */}
-             <div className="w-full max-w-5xl">
+             <div className={exporting ? 'w-[1120px]' : 'w-full max-w-5xl'} ref={chartRef}>
+                {/* Export Header - Only visible during export via html-to-image processing */}
+                {exporting && (
+                    <div className="flex flex-col items-center mb-8 text-center">
+                        <div className="flex items-center gap-3 mb-2">
+                            <img src="/img/icon.webp" className="w-12 h-12" alt="icon" />
+                            <h1 className="font-bold text-amber-900 text-4xl">太鼓达人难度分级表</h1>
+                            <span className="bg-amber-100 px-4 py-1 rounded-full font-bold text-amber-800">BY PROBER.OURTAIKO.ORG</span>
+                        </div>
+                        <div className="flex gap-3 text-xl">
+                            <span className="bg-amber-100 px-4 py-1 rounded-full font-bold text-amber-800">等级: {selectedLevel} ★</span>
+                            <span className="bg-amber-100 px-4 py-1 rounded-full font-bold text-amber-800">目标: {types.find(t => t.value === selectedType)?.label}</span>
+                        </div>
+                    </div>
+                )}
+
                 {loading ? (
                     <div className="flex justify-center py-20">
                         <Loader2 className="w-10 h-10 text-amber-500 animate-spin" />
@@ -125,13 +205,13 @@ const DifficultyChartPage: React.FC = () => {
                         <p>{error}</p>
                     </div>
                 ) : chartData ? (
-                    <div className="flex flex-col gap-8">
+                    <div className={`flex flex-col gap-8 ${exporting ? 'w-full px-0' : ''}`}>
                         {chartData.sections.map((section, idx) => (
-                            <div key={idx} className="bg-white/60 shadow-sm backdrop-blur-sm p-4 sm:p-6 rounded-3xl">
+                            <div key={idx} className={`bg-white/60 shadow-sm backdrop-blur-sm rounded-3xl ${exporting ? 'p-8 w-full' : 'p-4 sm:p-6'}`}>
                                 <h3 className="inline-block mb-4 pb-2 border-amber-200 border-b-2 font-bold text-amber-900 text-xl">
                                     {section.name}
                                 </h3>
-                                <div className="gap-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                                <div className={`gap-3 grid ${exporting ? 'grid-cols-5' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'}`}>
                                     {section.songs.map((chartSong, sIdx) => {
                                         const songId = parseInt(chartSong.id)
                                         if (isNaN(songId)) return null
@@ -181,6 +261,13 @@ const DifficultyChartPage: React.FC = () => {
                                 </div>
                             </div>
                         ))}
+                        
+                        {/* Export Footer */}
+                        {exporting && (
+                            <div className="mt-8 pt-6 border-amber-200/50 border-t w-full text-center">
+                                <p className="font-medium text-amber-900/40 text-lg">Donder Tool - ourtaiko.org</p>
+                            </div>
+                        )}
                     </div>
                 ) : null}
              </div>
