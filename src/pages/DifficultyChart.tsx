@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useAppContext } from '../contexts/AppContext'
 import { DifficultyChart as IDifficultyChart } from '../types/DifficultyChart'
 import { Score } from '../types/Score'
+import QuickNavOfDifficultyChart from '../components/QuickNavOfDifficultyChart'
 
 const DifficultyChartPage: React.FC = () => {
     const { songData, scores, setDetailVisible, setDetailSongId, setDetailLevel } = useAppContext()
@@ -25,8 +26,10 @@ const DifficultyChartPage: React.FC = () => {
     const [loading, setLoading] = useState(false)
     const [exporting, setExporting] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [selectedSectionIndex, setSelectedSectionIndex] = useState<number | null>(null)
     
     const chartRef = useRef<HTMLDivElement>(null)
+    const sectionRefs = useRef<{ [key: number]: HTMLDivElement | null }>({})
 
     useEffect(() => {
         const fetchData = async () => {
@@ -122,8 +125,38 @@ const DifficultyChartPage: React.FC = () => {
         setDetailVisible(true)
     }
 
+    const scrollToSection = (index: number) => {
+        setSelectedSectionIndex(index)
+        const element = sectionRefs.current[index]
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+            })
+            setTimeout(() => {
+                window.scrollBy({
+                    top: -80,
+                    behavior: 'smooth'
+                })
+            }, 100)
+        }
+    }
+
     return (
-        <div className="flex flex-col items-center gap-6 pb-20 w-full animate-fade-in">
+        <div className="flex gap-6 pb-20 w-full">{/* 去掉 animate-fade-in */}
+             {/* 快速导航组件 */}
+             {chartData && (
+                <QuickNavOfDifficultyChart
+                    sections={chartData.sections}
+                    selectedSectionIndex={selectedSectionIndex}
+                    onSectionClick={scrollToSection}
+                    exporting={exporting}
+                />
+             )}
+             
+             {/* Main Content */}
+             <div className="flex flex-col items-center gap-6 w-full">
              {/* Filter Section */}
              <div className="flex flex-wrap justify-center gap-4 bg-white/80 shadow-sm backdrop-blur-md p-4 rounded-2xl w-full max-w-4xl">
                  <div className="flex items-center gap-2">
@@ -209,7 +242,11 @@ const DifficultyChartPage: React.FC = () => {
                 ) : chartData ? (
                     <div className={`flex flex-col gap-8 ${exporting ? 'w-full px-0' : ''}`}>
                         {chartData.sections.map((section, idx) => (
-                            <div key={idx} className={`bg-white/60 shadow-sm backdrop-blur-sm rounded-3xl ${exporting ? 'p-8 w-full' : 'p-4 sm:p-6'}`}>
+                            <div 
+                                key={idx} 
+                                ref={(el) => { sectionRefs.current[idx] = el }}
+                                className={`bg-white/60 shadow-sm backdrop-blur-sm rounded-3xl ${exporting ? 'p-8 w-full' : 'p-4 sm:p-6'}`}
+                            >
                                 <h3 className="inline-block mb-4 pb-2 border-amber-200 border-b-2 font-bold text-amber-900 text-xl">
                                     {section.name}
                                 </h3>
@@ -273,6 +310,7 @@ const DifficultyChartPage: React.FC = () => {
                     </div>
                 ) : null}
              </div>
+        </div>
         </div>
     )
 }
