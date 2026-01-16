@@ -146,6 +146,11 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
             e.stopPropagation()
             goToPrevious()
           }}
+          onTouchEnd={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            goToPrevious()
+          }}
           className="top-1/2 left-4 z-10 absolute hover:bg-white/20 p-3 rounded-full transition-colors -translate-y-1/2"
         >
           <ChevronLeft className="w-8 h-8 text-white" />
@@ -186,6 +191,11 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
             e.stopPropagation()
             goToNext()
           }}
+          onTouchEnd={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            goToNext()
+          }}
           className="top-1/2 right-4 z-10 absolute hover:bg-white/20 p-3 rounded-full transition-colors -translate-y-1/2"
         >
           <ChevronRight className="w-8 h-8 text-white" />
@@ -200,6 +210,11 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, visible, onClose })
               key={index}
               onClick={(e) => {
                 e.stopPropagation()
+                setCurrentIndex(index)
+              }}
+              onTouchEnd={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
                 setCurrentIndex(index)
               }}
               className={`w-2 h-2 rounded-full transition-all ${
