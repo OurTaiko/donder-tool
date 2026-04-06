@@ -49,13 +49,13 @@ const Detail: React.FC<DetailProps> = ({
     const score = scores?.find((s: Score) => s.song_no === songId && s.level === selectLevel)
 
     if (!cn) return {
-        type: '',
-        title: '',
-        titleJp: '',
-        subtitle: '',
-        openDay: '',
-        score: score,
-        levels: []
+      type: '',
+      title: '',
+      titleJp: '',
+      subtitle: '',
+      openDay: '',
+      score: score,
+      levels: []
     }
 
     return {
@@ -65,12 +65,13 @@ const Detail: React.FC<DetailProps> = ({
       subtitle: cn.subtitle,
       openDay: (() => {
         const dateStr = cn.open_day
+        if (!dateStr) return '未知'
         const parts = dateStr.split('/')
         if (parts.length === 3) {
           const [month, day, year] = parts
           return `${year}.${month.padStart(2, '0')}.${day.padStart(2, '0')}`
         }
-        return ''
+        return dateStr
       })(),
       score,
       levels: ((): number[] => {
@@ -108,12 +109,12 @@ const Detail: React.FC<DetailProps> = ({
       }
       const previewData = await response.json()
       const images = previewData[selectLevel.toString()] || []
-      
+
       if (images.length === 0) {
         toast.error('该难度暂无预览图片咚~')
         return
       }
-      
+
       setPreviewImages(images)
       setGalleryVisible(true)
     } catch (error) {
@@ -200,14 +201,12 @@ const Detail: React.FC<DetailProps> = ({
                 <div
                   key={index}
                   onClick={() => handleLevelChange(index + 1)}
-                  className={`relative w-15 rounded-t-lg border-2 border-b-none border-amber-950 overflow-hidden transition-all cursor-pointer hover:opacity-100 ${
-                    index + 1 === 1 ? 'bg-red-300' :
+                  className={`relative w-15 rounded-t-lg border-2 border-b-none border-amber-950 overflow-hidden transition-all cursor-pointer hover:opacity-100 ${index + 1 === 1 ? 'bg-red-300' :
                     index + 1 === 2 ? 'bg-lime-300' :
-                    index + 1 === 3 ? 'bg-blue-300' :
-                    index + 1 === 4 ? 'bg-pink-300' : 'bg-purple-300'
-                  } ${
-                    selectLevel === index + 1 ? 'h-10 opacity-100' : 'h-8 opacity-50'
-                  }`}
+                      index + 1 === 3 ? 'bg-blue-300' :
+                        index + 1 === 4 ? 'bg-pink-300' : 'bg-purple-300'
+                    } ${selectLevel === index + 1 ? 'h-10 opacity-100' : 'h-8 opacity-50'
+                    }`}
                 >
                   <div className="absolute bg-gradient-to-b from-white/50 to-transparent w-full h-full"></div>
                   <div className="relative flex justify-center items-center space-x-1 w-full h-full">
